@@ -1,4 +1,4 @@
-package com.example.cryptoradar.util
+package com.example.cryptoradar.core.presentation.util
 
 import com.example.cryptoradar.R
 

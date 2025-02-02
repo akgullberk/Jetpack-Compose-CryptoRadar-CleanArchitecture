@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import com.example.cryptoradar.crypto.domain.Coin
 import java.util.Locale
 import android.icu.text.NumberFormat
-import com.example.cryptoradar.util.getDrawableIdForCoin
+import com.example.cryptoradar.core.presentation.util.getDrawableIdForCoin
 
 data class CoinUi(
     val id: String, // Coin'in benzersiz kimliği
