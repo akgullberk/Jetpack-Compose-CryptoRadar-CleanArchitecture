@@ -13,6 +13,8 @@ import com.example.cryptoradar.core.domain.util.onError
 import com.example.cryptoradar.core.domain.util.onSuccess
 import com.example.cryptoradar.crypto.domain.CoinDataSource
 import com.example.cryptoradar.crypto.presentation.models.toCoinUi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 
 // ViewModel sınıfı, Jetpack Compose veya diğer UI bileşenlerinde
 // kullanılacak olan CoinList ekranının mantığını yönetir.
@@ -33,6 +35,16 @@ class CoinListViewModel(
             SharingStarted.WhileSubscribed(5000L), // 5 saniye boyunca abonelik aktif olmazsa durdurulur.
             CoinListState() // Varsayılan başlangıç değeri
         )
+
+    // '_events' adında bir özel (private) Channel oluşturuluyor.
+    // Channel, bir tür asenkron veri kuyruğudur. Burada, 'CoinListEvent' tipinde veriler iletiliyor.
+    // Bu kanal, olayların sırasıyla taşınmasına olanak tanır.
+    private val _events = Channel<CoinListEvent>()
+
+    // 'events' adında bir public Flow oluşturuluyor.
+    // 'receiveAsFlow()' fonksiyonu, kanal üzerinden gelen verileri bir Flow'a dönüştürür.
+    // Bu, 'events' akışını (Flow) dinleyen bileşenlerin, veri geldiğinde tepki vermesini sağlar.
+    val events = _events.receiveAsFlow()
 
     // Kullanıcıdan gelen eylemleri işlemek için kullanılan fonksiyon
     fun onAction(action: CoinListAction) {
@@ -63,6 +75,12 @@ class CoinListViewModel(
                 }
                 .onError { error -> // Eğer hata olursa
                     _state.update { it.copy(isLoading = false) } // Yüklemeyi durdur
+
+                    // '_events' kanalına 'CoinListEvent.Error' türünde bir olay gönderiliyor.
+                    // 'CoinListEvent.Error' sınıfı, bir hata mesajını (NetworkError) taşır.
+                    // 'error' değişkeni, bu hatayı temsil eder ve bu veri kanal aracılığıyla iletilir.
+                    // Kanal, olayları alacak ve bunları 'Flow' olarak iletecektir.
+                    _events.send(CoinListEvent.Error(error))
                 }
         }
     }
