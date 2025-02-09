@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.cryptoradar.core.presentation.util.ObserveAsEvents
 import com.example.cryptoradar.core.presentation.util.toString
+import com.example.cryptoradar.crypto.presentation.coinDetail.CoinDetailScreen
 import com.example.cryptoradar.crypto.presentation.coinList.CoinListEvent
 import com.example.cryptoradar.crypto.presentation.coinList.CoinListScreen
 import com.example.cryptoradar.crypto.presentation.coinList.CoinListViewModel
@@ -45,10 +46,21 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    CoinListScreen(
-                        state = state,
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    when {
+                        state.selectedCoin != null -> {
+                            CoinDetailScreen(
+                                state = state,
+                                modifier = Modifier.padding(innerPadding)
+                            )
+                        }
+                        else -> {
+                            CoinListScreen(
+                                state = state,
+                                modifier = Modifier.padding(innerPadding),
+                                onAction = viewModel::onAction
+                            )
+                        }
+                    }
                 }
             }
         }

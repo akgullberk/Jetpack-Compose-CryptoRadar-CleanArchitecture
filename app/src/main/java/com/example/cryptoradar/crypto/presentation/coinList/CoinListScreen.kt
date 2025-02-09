@@ -35,6 +35,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun CoinListScreen(
     state: CoinListState, // Ekrandaki mevcut durumu temsil eden veri sınıfı
+    onAction: (CoinListAction) -> Unit,
     modifier: Modifier = Modifier // Varsayılan olarak boş, dışarıdan özelleştirilebilen stil ayarı
 ) {
 
@@ -58,7 +59,10 @@ fun CoinListScreen(
             items(state.coins) { coinUi ->
                 CoinListItem(
                     coinUi = coinUi,
-                    onClick = { /*TODO*/ }, // Öğeye tıklanınca yapılacak işlem
+                    onClick = {
+                        onAction(CoinListAction.OnCoinClick(coinUi))
+
+                    }, // Öğeye tıklanınca yapılacak işlem
                     modifier = Modifier.fillMaxWidth() // Tam genişlik kaplamasını sağlar
                 )
                 HorizontalDivider() // Her öğe arasında bir çizgi ekler
@@ -79,7 +83,8 @@ private fun CoinListScreenPreview() {
                 }
             ),
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.background),
+            onAction = {}
         )
     }
 }
