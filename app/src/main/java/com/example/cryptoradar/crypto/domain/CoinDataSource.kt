@@ -2,6 +2,7 @@ package com.example.cryptoradar.crypto.domain
 
 import com.example.cryptoradar.core.domain.util.NetworkError
 import com.example.cryptoradar.core.domain.util.Result
+import java.time.ZonedDateTime
 
 // CoinDataSource adında bir interface tanımlıyoruz.
 // Bu interface, kripto paralarla ilgili veri kaynağını temsil eder.
@@ -14,4 +15,10 @@ interface CoinDataSource {
     // - Başarı durumunda: List<Coin> (Coin nesnelerinin bir listesi)
     // - Hata durumunda: NetworkError (Ağ hatası türlerinden biri)
     suspend fun getCoins(): Result<List<Coin>, NetworkError>
+
+    suspend fun getCoinHistory(
+        coinId: String,
+        start: ZonedDateTime,
+        end: ZonedDateTime
+    ): Result<List<CoinPrice>,NetworkError>
 }

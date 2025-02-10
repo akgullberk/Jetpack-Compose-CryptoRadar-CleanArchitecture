@@ -12,9 +12,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.cryptoradar.core.domain.util.onError
 import com.example.cryptoradar.core.domain.util.onSuccess
 import com.example.cryptoradar.crypto.domain.CoinDataSource
+import com.example.cryptoradar.crypto.presentation.models.CoinUi
 import com.example.cryptoradar.crypto.presentation.models.toCoinUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import java.time.ZonedDateTime
 
 // ViewModel sınıfı, Jetpack Compose veya diğer UI bileşenlerinde
 // kullanılacak olan CoinList ekranının mantığını yönetir.
@@ -50,10 +52,27 @@ class CoinListViewModel(
     fun onAction(action: CoinListAction) {
         when(action) {
             is CoinListAction.OnCoinClick -> { // Kullanıcı bir coine tıkladığında yapılacak işlemler buraya eklenebilir.
-                _state.update { it.copy(
-                    selectedCoin = action.coinUi
-                ) }
+                selectCoin(action.coinUi)
             }
+        }
+    }
+
+    private fun selectCoin(coinUi: CoinUi) {
+        _state.update { it.copy(selectedCoin = coinUi) }
+
+        viewModelScope.launch {
+            coinDataSource
+                .getCoinHistory(
+                    coinId = coinUi.id,
+                    start = ZonedDateTime.now().minusDays(5),
+                    end = ZonedDateTime.now()
+                )
+                .onSuccess { history ->
+                    println(history)
+                }
+                .onError { error ->
+                    _events.send(CoinListEvent.Error(error))
+                }
         }
     }
 
