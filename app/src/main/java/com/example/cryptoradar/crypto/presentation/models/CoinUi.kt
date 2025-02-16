@@ -5,6 +5,7 @@ import com.example.cryptoradar.crypto.domain.Coin
 import java.util.Locale
 import android.icu.text.NumberFormat
 import com.example.cryptoradar.core.presentation.util.getDrawableIdForCoin
+import com.example.cryptoradar.crypto.presentation.coinDetail.DataPoint
 
 data class CoinUi(
     val id: String, // Coin'in benzersiz kimliği
@@ -14,6 +15,7 @@ data class CoinUi(
     val marketCapUsd: DisplayableNumber, // Coin'in piyasa değeri (USD cinsinden, formatlanmış)
     val priceUsd: DisplayableNumber, // Coin'in fiyatı (USD cinsinden, formatlanmış)
     val changePercent24Hr: DisplayableNumber, // Coin'in 24 saatlik değişim yüzdesi (formatlanmış)
+    val coinPriceHistory: List<DataPoint> = emptyList(),
     @DrawableRes val iconRes: Int // Coin için kullanılacak simge (drawable resource id)
 )
 

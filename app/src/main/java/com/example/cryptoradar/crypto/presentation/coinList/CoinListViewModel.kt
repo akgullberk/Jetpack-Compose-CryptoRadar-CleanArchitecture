@@ -12,11 +12,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.cryptoradar.core.domain.util.onError
 import com.example.cryptoradar.core.domain.util.onSuccess
 import com.example.cryptoradar.crypto.domain.CoinDataSource
+import com.example.cryptoradar.crypto.presentation.coinDetail.DataPoint
 import com.example.cryptoradar.crypto.presentation.models.CoinUi
 import com.example.cryptoradar.crypto.presentation.models.toCoinUi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 
 // ViewModel sınıfı, Jetpack Compose veya diğer UI bileşenlerinde
 // kullanılacak olan CoinList ekranının mantığını yönetir.
@@ -68,7 +70,25 @@ class CoinListViewModel(
                     end = ZonedDateTime.now()
                 )
                 .onSuccess { history ->
-                    println(history)
+                    val dataPoints = history
+                        .sortedBy { it.dateTime }
+                        .map {
+                            DataPoint(
+                                x = it.dateTime.hour.toFloat(),
+                                y = it.priceUsd.toFloat(),
+                                xLabel = DateTimeFormatter
+                                    .ofPattern("ha\nM/d")
+                                    .format(it.dateTime)
+                            )
+                        }
+
+                    _state.update {
+                        it.copy(
+                            selectedCoin = it.selectedCoin?.copy(
+                                coinPriceHistory = dataPoints
+                            )
+                        )
+                    }
                 }
                 .onError { error ->
                     _events.send(CoinListEvent.Error(error))
